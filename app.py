@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 from groq import Groq
 from typing import Generator
@@ -13,7 +12,7 @@ chat_area = col_right.container(height=350)
 
 # Groq API Key
 if "GROQ_API_KEY" not in st.session_state:
-    st.session_state.GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    st.session_state.GROQ_API_KEY = st.secrets['GROQ_API_KEY']
 
 if st.session_state.GROQ_API_KEY is None:
     raise ValueError("GROQ_API_KEY environment variable is not set")
