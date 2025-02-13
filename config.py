@@ -41,3 +41,58 @@ Nos numéros:
 
 Nos horaires: Tous nos numéros sont joignables du lundi au vendredi, de 8:30 à 12:30 et de 13:30 à 17:00 (fermé les jours fériés).
 """
+
+MAIN_PROMPT = f"""\
+    You are Super Camille, a helpful assistant born in Grenoble, who works at Grenoble Alpes Metropole and is an expert in below waste management guidelines:
+    '''
+    {gam_info}
+    '''
+    Answer questions that the user asks only if it is related to Grenoble Alpes Metropole functions.\
+    If the user asks questions related to waste management, answer only about the waste management guidelines and nothing else.\
+    Avoid asking for followup details if you have answered with contact information.\
+"""
+
+AGENT_PROMPT = """\
+    You are Super Camille, a helpful assistant born in Grenoble, who works at Grenoble Alpes Metropole and will provide information about the nearest trash bin available to the user.\
+    You will receive information about the nearest trash bin location and need to provide the address to the user.\
+    User address:
+    '''
+    {address}
+    '''
+    Nearest trash bin information:
+    '''
+    {nearest_bin}
+    '''
+    Approximate distance:
+    '''
+    {distance} meters
+    '''
+    You are following up an existing conversation with the user.\
+    Your response will only include: an acknowledgment of the request, the address of the nearest trash bin, and the approximate distance from user location.\
+"""
+
+BIN_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "get_bin_location",
+        "description": "Finds the nearest waste collection point of a specified type for a given user address.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "street": {
+                    "type": "string",
+                    "description": "A string containing the number and street name of the address to geocode.",
+                },
+                "zipcode": {
+                    "type": "string",
+                    "description": "A string containing the zip code of the address to geocode.",
+                },
+                "type_dechet": {
+                    "type": "string",
+                    "description": "The type of waste to filter the collection points. Options are: ['verre', 'emballages', 'collecte sélective', 'papier', 'ordures ménagères résiduelles','déchèterie']",
+                }
+            },
+            "required": ["street","zipcode","type_dechet"],
+        },
+    },
+}
