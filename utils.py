@@ -1,5 +1,6 @@
 import copy
 import requests
+import base64
 import pandas as pd
 import pydeck as pdk
 from config import AGENT_PROMPT
@@ -106,3 +107,7 @@ def gen_gmaps_url(user_location, bin_location):
     user_lat, user_long = user_location[0], user_location[1]
     bin_lat, bin_long = bin_location[0], bin_location[1]
     return f'https://www.google.com/maps/dir/{user_lat},{user_long}/{bin_lat},{bin_long}'
+
+# Function to encode the image
+def encode_image(image_bytes):
+    return base64.b64encode(image_bytes).decode('utf-8')

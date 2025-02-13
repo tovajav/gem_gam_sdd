@@ -71,6 +71,30 @@ AGENT_PROMPT = """\
     Your response will only include: an acknowledgment of the request, the address of the nearest trash bin, and the approximate distance from user location.\
 """
 
+
+VISION_PROMPT =  lambda bytes: [
+    {
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Describe the main object and its material in this image in one sentence."},
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{bytes}",
+                },
+            },
+        ],
+    }
+]
+
+VISION_USER = """\
+    I have taken a photo of what is in front of me. Please provide assistance with below photo description:
+    '''
+    {description}
+    '''
+    Provide any useful information based on your expertise.\
+"""
+
 BIN_TOOL = {
     "type": "function",
     "function": {
