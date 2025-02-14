@@ -31,10 +31,8 @@
 pip install groq geopy flask flask_cors
 ```
 ### 3. Set up Groq API Key:
-Ensure you have an API key from Groq. This key should be stored securely using Streamlit's secrets management:
-https://docs.streamlit.io/develop/concepts/connections/secrets-management
-```sh
-# .streamlit/secrets.toml
+Ensure you have an API key from Groq.
+```
 GROQ_API_KEY="your_groq_api_key_here"
 ```
 ### 4. Run the App: 
