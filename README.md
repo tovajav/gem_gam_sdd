@@ -1,4 +1,4 @@
-# Super Camille - Grenoble Alpes Metropole Assistant
+# Camille - Grenoble Alpes Metropole Assistant
 
 --- 
 ### Streamlit Version : [branch](https://github.com/tovajav/gem_gam_sdd/edit/Web_Integration)
@@ -24,6 +24,24 @@
 - Groq Python SDK
 
 ## Installation
+### 0.  Tree Structure
+
+```
+Web-Integration Branch
+├── Gam_Chatbot                                                           # Main chatbot application folder
+│   ├── img                                                               # Directory for image assets
+│   │   ├── pictures.png                                                  # Help icon for AI functionalities
+│   ├── app.py                                                            # Main Python application file for the chatbot and th local server
+│   ├── config.py                                                         # Configuration settings for the chatbot
+│   ├── index.html                                                        # HTML file for the chatbot's web interface
+│   ├── scriptCamilleAIBot.js                                             # JavaScript file for interactive elements in the web interface
+│   └── scriptCamilleAIBot.css                                            # CSS file for styling the web interface
+└── Grenoble Alpes Métropole - Isère - Grenoble Alpes Métropole_files     # Folder containing assets and resources for a webpage
+    └── ...                                                               # Other files (a lot)
+└── Grenoble Alpes Métropole - Isère - Grenoble Alpes Métropole.html      # Main HTML document for the webpage about Grenoble Alpes Métropole which include the index.html
+```
+
+To test the chatbot only the Gam_Chabot folder is required
 
 ### 1. Clone this repository
 ### 2. Install dependencies:
