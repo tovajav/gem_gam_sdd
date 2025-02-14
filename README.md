@@ -7,7 +7,6 @@
 
 ### Local Version - Web Site Integration : [branch](https://github.com/tovajav/gem_gam_sdd/tree/Web_Integration)
 - A local chatbot interface that provides information about waste management services in Grenoble Alpes Metropole.
-- 
 ---
 
 ## Features
