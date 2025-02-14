@@ -1,4 +1,4 @@
-# Super Camille - Grenoble Alpes Metropole Assistant
+# Camille - Grenoble Alpes Metropole Assistant
 
 --- 
 ### Streamlit Version : [branch](https://github.com/tovajav/gem_gam_sdd/edit/Web_Integration)
