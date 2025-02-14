@@ -41,7 +41,7 @@ Web-Integration Branch
 └── Grenoble Alpes Métropole - Isère - Grenoble Alpes Métropole.html      # Main HTML document for the webpage about Grenoble Alpes Métropole which include the index.html
 ```
 
-To test the chatbot only the Gam_Chabot folder is required
+To test the chatbot, only the Gam_Chabot folder is required
 
 ### 1. Clone this repository
 ### 2. Install dependencies:
