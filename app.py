@@ -100,8 +100,7 @@ for message in st.session_state.messages:
 @st.dialog("Take a photo")
 def vision_response():
     st.write('Use your camera')
-    enable = st.checkbox("Enable camera")
-    picture = st.camera_input("Take a picture", disabled=not(enable))
+    picture = st.camera_input("Take a picture")
     if st.button("Upload") and picture is not None:
         base64_image = encode_image(picture.getvalue())
         vision_completion = client.chat.completions.create(messages=VISION_PROMPT(base64_image), model="llama-3.2-11b-vision-preview")
