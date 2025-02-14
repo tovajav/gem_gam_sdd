@@ -36,7 +36,8 @@ if "DF" not in st.session_state:
     # with st.spinner("Retrieving waste disposal points...", show_time=True):
     #     df2 = get_decheteries_from_url()
     # df = pd.concat([df, df2], ignore_index = True).reset_index(drop = True)
-    st.session_state.DF = pd.read_csv('gam_data.csv')
+    df = pd.read_csv('gam_data.csv')
+    st.session_state.DF = df
 
 def messages_append(prompt):
     st.session_state.messages.append(prompt)

@@ -20,7 +20,6 @@ def get_points_collecte_from_url():
     columns = ['fields.id','fields.type_conteneur','fields.geo_point_2d','fields.secteur','fields.commune','fields.adresse','fields.type_dechet']
     df_geo = df[columns]
     df_geo.columns = df_geo.columns.str.replace('fields.', '')
-    df_geo.loc[:, 'geo_point_2d'] = df_geo['geo_point_2d'].apply(lambda x: tuple(map(float, x.split(','))))
     df_geo.insert(1, 'nom', df_geo['type_dechet'] + ' ' + df_geo['type_conteneur'])
     df_geo = df_geo.drop(columns=['type_conteneur'])
     df_geo['horaires_ouverture'] = '24h'
@@ -36,7 +35,6 @@ def get_decheteries_from_url():
     columns = ['fields.id','fields.nom','fields.geo_point_2d','fields.groupement','fields.commune','fields.adresse','fields.horaires_ouverture','fields.jours_ouverture','fields.types_materiaux']
     df_geo = df[columns].fillna('Inconnu')
     df_geo.columns = df_geo.columns.str.replace('fields.', '')
-    df_geo.loc[:, 'geo_point_2d'] = df_geo['geo_point_2d'].apply(lambda x: tuple(map(float, x.split(','))))
     df_geo.insert(6, 'type_dechet', 'déchèterie')
     return df_geo
 
@@ -50,7 +48,7 @@ def get_address_geolocation(address):
     Returns:
         tuple: A tuple containing the latitude and longitude of the address.
     """
-    geolocator = Nominatim(user_agent='test')
+    geolocator = Nominatim(user_agent='gam')
     location = geolocator.geocode(query=address, country_codes='fr')
     return (location.latitude, location.longitude)
 
@@ -67,6 +65,7 @@ def find_nearest_dechet(df, address, type_dechet):
         pandas.Series: The record of the nearest waste collection point.
     """
     try:
+        df.loc[:, 'geo_point_2d'] = df['geo_point_2d'].apply(lambda x: tuple(map(float, x.split(','))))
         df_filtered = df[df['type_dechet'] == type_dechet]  # Filter the dataframe by type_dechet
         coordinate = get_address_geolocation(address)       # Get address coordinates
         distances = df_filtered.apply(                      # Calculate distances
@@ -92,16 +91,20 @@ def get_bin_location(street, zipcode, type_dechet, df):
     Returns:
         tuple: A tuple containing the message prompt and the nearest waste bin location.
     """
-    address = f'{street} {zipcode}'
-    nearest_location = find_nearest_dechet(df, address, type_dechet)
-    nearest_bin = copy.deepcopy(nearest_location)
-    del nearest_bin['id'], nearest_bin['geo_point_2d'], nearest_bin['secteur'], nearest_bin['commune'], nearest_bin['distance'], nearest_bin['user']
-    message = [sys_prompt(AGENT_PROMPT.format(
-        address=address, 
-        nearest_bin=nearest_bin,
-        distance=nearest_location['distance']
-    ))]
-    return (message, nearest_location)
+    try:
+        address = f'{street} {zipcode}'
+        nearest_location = find_nearest_dechet(df, address, type_dechet)
+        nearest_bin = copy.deepcopy(nearest_location)
+        del nearest_bin['id'], nearest_bin['geo_point_2d'], nearest_bin['secteur'], nearest_bin['commune'], nearest_bin['distance'], nearest_bin['user']
+        message = [sys_prompt(AGENT_PROMPT.format(
+            address=address, 
+            nearest_bin=nearest_bin,
+            distance=nearest_location['distance']
+        ))]
+        return (message, nearest_location)
+    except Exception as e:
+        error_prompt = 'You are Super Camille working at Grenoble Alpes Metropole. You were unable to get the bin location with user provided address.'
+        return ([sys_prompt(error_prompt)], None)
 
 def gen_gmaps_url(user_location, bin_location):
     user_lat, user_long = user_location[0], user_location[1]
