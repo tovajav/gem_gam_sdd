@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Grenoble Alpes Métropole</title>
+  <link rel="stylesheet" href="stylesCamilleAIBot.css">
+</head>
+<body>
+
+  <!-- 🔸 Barre jaune du haut -->
+  <header class="header-top">
+    <div class="header-top-left">
+      <!-- Remplacez le texte par une image si nécessaire -->
+      <img src="img/Logo_Grenoble_Alpes_Métropole.svg.png" alt="Grenoble Alpes Métropole" class="header-logo">
+      <div class="header-title">GRENOBLE&nbsp;ALPES MÉTROPOLE</div>
+    </div>
+    <div class="header-top-right">
+      <a href="#">Contactez-nous</a>
+      <a href="#">Langue</a>
+      <a href="#">Accessibilité</a>
+    </div>
+  </header>
+
+  <!-- 🔸 Barre blanche de navigation -->
+  <nav class="header-nav">
+    <ul class="nav-links">
+      <li><a href="#">Mon quotidien, ma Métropole</a></li>
+      <li><a href="#">Mes aides, mes démarches</a></li>
+      <li><a href="#">Informations pour les pros</a></li>
+    </ul>
+    <div class="nav-button">
+      <a href="#" class="button-espace-personnel">Espace personnel</a>
+    </div>
+  </nav>
+
+  <!-- 🔹 Chatbot -->
+  <div id="chatbot-container" class="chatbot-container">
+    <div class="chat-header">
+      <!-- <img src="Logo_Grenoble_Alpes_Métropole.svg.png" alt="Logo"> -->
+      <img src="img/AIhelp.png" alt="Logo">
+      <span>Camille</span>
+    </div>
+    <div id="chatbot-box" class="chat-box">
+      <!-- Message de bienvenue fixe -->
+      <div class="bot-message">
+        Bonjour! 👋 Bonjour, je suis Camille, assistante à Grenoble Alpes Metropole, spécialisée dans la gestion des déchets. (*I speak English too*)
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="chatbot-userInput" placeholder="Écrivez votre message ici...">
+      <button onclick="sendChatbotMessage()">➤</button>
+      <!-- <button id="chatbot-sendButton">➤</button> -->
+    </div>
+  </div>
+
+  <script src="scriptCamilleAIBot.js"></script>
+</body>
+</html>

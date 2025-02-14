@@ -1,0 +1,129 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.chat-container {
+    width: 350px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* En-tête du chatbot */
+.chat-header {
+    background-color: #ffee00;
+    color: black;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.chat-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+/* Zone des messages */
+.chat-box {
+    flex-grow: 1;
+    height: 300px;
+    padding: 10px;
+    overflow-y: auto;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Styles des messages */
+.message {
+    padding: 12px 16px;
+    margin: 8px;
+    border-radius: 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+    font-size: 14px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Message de l'utilisateur */
+.user-message {
+    background-color: #ffee00;
+    color: black;
+    align-self: flex-end;
+    text-align: right;
+    border-bottom-right-radius: 5px;
+}
+
+/* Message du chatbot */
+.bot-message {
+    background-color: #e9ecef;
+    color: black;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+/* Effet d'animation des messages */
+.message {
+    opacity: 0;
+    transform: scale(0.95);
+    animation: popIn 0.2s forwards;
+}
+
+@keyframes popIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Champ d'entrée et bouton */
+.chat-input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background: white;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    border-radius: 15px;
+    background: #f0f0f0;
+}
+
+button {
+    background: #ffee00;
+    border: none;
+    color: black;
+    padding: 10px;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+}
+
+button:hover {
+    background: #e6d800;
+}
+
+input[type="file"] {
+    margin: 10px;
+    padding: 5px;
+}

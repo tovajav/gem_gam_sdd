@@ -1,0 +1,246 @@
+/* ---- RESET SIMPLE (optionnel) ---- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---- Configuration générale de la page ---- */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #FCFCE4;
+}
+
+/* 
+   Pour éviter que le chatbot ne chevauche l’en‑tête,
+   on ne le positionne plus en absolute. 
+   On le centre avec un margin auto.
+*/
+
+/* ---- Barre jaune du haut ---- */
+.header-top {
+  background-color: #ffee00;  /* Couleur de fond jaune */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  position: fixed;            /* Fixe le header en haut */
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-top-left {
+  display: flex;
+  align-items: center;
+}
+.header-logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+.header-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.header-top-right a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+}
+
+/* ---- Barre blanche de navigation ---- */
+.header-nav {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  position: fixed;    /* Fixe la nav directement sous le header */
+  top: 60px;
+  left: 0; right: 0;
+  z-index: 999;       /* Juste sous le header-top */
+  height: 50px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Liens de navigation */
+.nav-links {
+  list-style: none;
+  display: flex;
+}
+.nav-links li a {
+  text-decoration: none;
+  color: #000;
+  margin-right: 2rem;
+  font-weight: 500;
+}
+
+/* Bouton Espace personnel */
+.nav-button .button-espace-personnel {
+  background-color: #0C7973;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.nav-button .button-espace-personnel:hover {
+  background-color: #095954;
+}
+
+.chatbot-container {
+  /* Largeur adaptable, mais bornée entre 500px et 900px */
+  width: 70%;              /* occupe 70% de la page en largeur */
+  min-width: 500px;        /* ne descend pas en dessous de 500px */
+  max-width: 2500px;        /* ne dépasse pas 900px */
+  
+  /* Même logique pour la hauteur */
+  height: 90%;
+  min-height: 520px;       /* évite un bloc trop petit */
+  max-height: 1000px;       /* évite un bloc trop grand */
+  /* height: auto;          on laisse la hauteur s'adapter au contenu */
+  
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  /* Espace en haut pour laisser place aux deux barres du header */
+  margin: 130px auto 40px auto; 
+}
+
+
+/* En-tête du chatbot */
+.chat-header {
+  background-color: #ffee00;
+  color: black;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.chat-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* Zone des messages */
+.chat-box {
+  flex-grow: 1;
+  height: 350px;
+  padding: 20px;
+  overflow-y: auto;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Styles des messages */
+.message {
+  padding: 15px 20px;
+  border-radius: 20px;
+  max-width: 75%;
+  word-wrap: break-word;
+  font-size: 16px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+
+/* Message de l'utilisateur */
+.user-message {
+  background-color: #ffee00;
+  color: black;
+  align-self: flex-end;
+  text-align: left;
+  border-radius: 15px 15px 0 15px;
+  max-width: 80%;
+  font-size: 16px;
+  padding: 12px 18px;
+}
+
+/* Message du chatbot */
+.bot-message {
+  background-color: #e9ecef;
+  color: black;
+  align-self: flex-start;
+  border-radius: 15px 15px 15px 0;
+  max-width: 80%;
+  font-size: 16px;
+  padding: 12px 18px;
+}
+
+.bot-message ul {
+  padding-left: 20px;
+  margin-bottom: 5px;
+}
+
+.bot-message li {
+  list-style-type: disc; /* Affiche des puces */
+  margin-bottom: 5px;
+}
+
+/* Effet d'animation des messages */
+.message {
+  opacity: 0;
+  transform: scale(0.95);
+  animation: popIn 0.2s forwards;
+}
+@keyframes popIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Champ d'entrée et bouton */
+.chat-input-container {
+  display: flex;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+  background: white;
+}
+
+input[type="text"] {
+  flex-grow: 1;
+  padding: 14px;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  background: #f0f0f0;
+  font-size: 16px;
+}
+
+button {
+  background: #ffee00;
+  border: none;
+  color: black;
+  padding: 14px;
+  margin-left: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 22px;
+}
+button:hover {
+  background: #ffee00;
+}
+
+/* Pour affiner encore sur les petits écrans */
+@media (max-width: 600px) {
+.chatbot-container {
+  width: 90%;        /* prend presque toute la largeur */
+  min-width: unset;  /* enlève la restriction min-width si tu veux */
+  margin: 80px auto 20px auto;
+}
+}
