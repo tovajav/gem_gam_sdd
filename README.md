@@ -1,7 +1,7 @@
 # Camille - Grenoble Alpes Metropole Assistant
 
 --- 
-### Streamlit Version : [branch](https://github.com/tovajav/gem_gam_sdd/edit/Web_Integration)
+### Streamlit Version : [branch]([https://github.com/tovajav/gem_gam_sdd/edit/Web_Integration](https://github.com/tovajav/gem_gam_sdd?tab=readme-ov-file))
 - [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://gem-gam-sdd.streamlit.app/)
 - A Streamlit-based chatbot interface that provides information about waste management services in Grenoble Alpes Metropole.
 
