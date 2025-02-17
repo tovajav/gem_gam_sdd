@@ -1,6 +1,7 @@
 import copy
 import requests
 import base64
+import math
 import pandas as pd
 import pydeck as pdk
 from config import AGENT_PROMPT
@@ -11,6 +12,12 @@ from geopy.distance import geodesic
 INSTRUCT_MODELS = ['qwen-2.5-32b','deepseek-r1-distill-qwen-32b','deepseek-r1-distill-llama-70b','llama-3.3-70b-versatile','llama-3.1-8b-instant','mixtral-8x7b-32768','gemma2-9b-it']
 
 sys_prompt = lambda x: {"role": "system", "content": x}
+
+def custom_ceil(number):
+    if number < 1000:
+        return math.ceil(number / 50) * 50
+    else:
+        return math.ceil(number / 100) * 100
 
 def get_points_collecte_from_url():
     url = 'https://data.metropolegrenoble.fr/d4c/api/records/1.0/search/dataset=points_de_collecte_et_de_traitement_des_dechets_et_points_d_ap&rows=2000&facet=secteur'
@@ -65,15 +72,13 @@ def find_nearest_dechet(df, address, type_dechet):
         pandas.Series: The record of the nearest waste collection point.
     """
     try:
-        df.loc[:, 'geo_point_2d'] = df['geo_point_2d'].apply(lambda x: tuple(map(float, x.split(','))))
-        df_filtered = df[df['type_dechet'] == type_dechet]  # Filter the dataframe by type_dechet
-        coordinate = get_address_geolocation(address)       # Get address coordinates
-        distances = df_filtered.apply(                      # Calculate distances
-            lambda x: geodesic(coordinate, x['geo_point_2d']).meters, axis=1
-        )
-        nearest_index = distances.idxmin()                  # Find the index of the smallest distance
-        target_location = df.loc[nearest_index].to_dict()   # Return the record with the smallest distance
-        target_location['distance'] = int(distances.min())  # Add estimate distance
+        df_filtered = df[df['type_dechet'] == type_dechet]                     # Filter the dataframe by type_dechet
+        coordinate = get_address_geolocation(address)                          # Get address coordinates
+        distances = df_filtered['geo_point_2d'].apply(lambda x: tuple(map(float, x.split(','))))
+        distances = distances.apply(lambda x: geodesic(coordinate, x).meters)  # Calculate distances
+        nearest_index = distances.idxmin()                                     # Find the index of the smallest distance
+        target_location = df.loc[nearest_index].to_dict()                      # Return the record with the smallest distance
+        target_location['distance'] = int(distances.min())                     # Add estimate distance
         target_location['user'] = coordinate
         return target_location
     except Exception as e:
@@ -91,26 +96,30 @@ def get_bin_location(street, zipcode, type_dechet, df):
     Returns:
         tuple: A tuple containing the message prompt and the nearest waste bin location.
     """
-    try:
-        address = f'{street} {zipcode}'
-        nearest_location = find_nearest_dechet(df, address, type_dechet)
+    address = f'{street} {zipcode}'
+    nearest_location = find_nearest_dechet(df, address, type_dechet)
+    if nearest_location is not None:
         nearest_bin = copy.deepcopy(nearest_location)
         del nearest_bin['id'], nearest_bin['geo_point_2d'], nearest_bin['secteur'], nearest_bin['commune'], nearest_bin['distance'], nearest_bin['user']
         message = [sys_prompt(AGENT_PROMPT.format(
             address=address, 
             nearest_bin=nearest_bin,
-            distance=nearest_location['distance']
+            distance=custom_ceil(nearest_location['distance'])
         ))]
         return (message, nearest_location)
-    except Exception as e:
-        error_prompt = 'You are Super Camille working at Grenoble Alpes Metropole. You were unable to get the bin location with user provided address.'
+    else:
+        error_prompt = 'You are Super Camille working at Grenoble Alpes Metropole. Provide a short and polite response that you were unable to get the bin location with user provided address.'
         return ([sys_prompt(error_prompt)], None)
 
 def gen_gmaps_url(user_location, bin_location):
+    if not isinstance(bin_location, tuple):
+        bin_location = tuple(map(float, bin_location.split(',')))
     user_lat, user_long = user_location[0], user_location[1]
     bin_lat, bin_long = bin_location[0], bin_location[1]
     return f'https://www.google.com/maps/dir/{user_lat},{user_long}/{bin_lat},{bin_long}'
 
-# Function to encode the image
 def encode_image(image_bytes):
+    '''
+    Function to encode the image
+    '''
     return base64.b64encode(image_bytes).decode('utf-8')

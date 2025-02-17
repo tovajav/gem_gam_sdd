@@ -6,13 +6,11 @@ from config import MAIN_PROMPT, BIN_TOOL, VISION_PROMPT, VISION_USER
 from utils import INSTRUCT_MODELS, get_points_collecte_from_url, get_decheteries_from_url, sys_prompt, get_bin_location, gen_gmaps_url, encode_image
 
 # Title of the app and config layout
-st.set_page_config(page_icon="💬", layout="wide", page_title="Grenoble Alpes Métropole - Super Camille")
+st.set_page_config(page_icon="💬", layout="centered", page_title="Grenoble Alpes Métropole - Super Camille", initial_sidebar_state='collapsed')
 st.logo('https://www.grenoblealpesmetropole.fr/images/GBI_LAMETRO/logo.svg', size='large')
-col_left, col_right = st.columns([1,3])
-col_left.subheader("Super Camille 🙋‍♀️")
-chat_area = col_right.container(height=350)
-tool_use = col_left.toggle('Bin locator super power', value=True)
-col_right_l, col_right_r = col_right.columns([5,1])
+st.subheader("Super Camille 🙋‍♀️")
+chat_area = st.container(height=300)
+col_1, col_2, col_3 = st.columns([4,1,1])
 
 # Initialize the Groq model
 if "GROQ_API_KEY" not in st.session_state:
@@ -23,7 +21,8 @@ client = Groq(api_key = st.secrets['GROQ_API_KEY'])
 
 # Initialize streamlit session state variables
 if "GROQ_MODELS" not in st.session_state:
-    st.session_state.GROQ_MODELS = {model.id : {'name': model.id.replace("-", " ").title(), 'tokens': model.context_window} for model in client.models.list().data if model.id in INSTRUCT_MODELS}
+    groq_models = {model.id : {'name': model.id.replace("-", " ").title(), 'tokens': model.context_window} for model in client.models.list().data if model.id in INSTRUCT_MODELS}
+    st.session_state.GROQ_MODELS = dict(sorted(groq_models.items()))
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "filtered_messages" not in st.session_state:
@@ -31,13 +30,7 @@ if "filtered_messages" not in st.session_state:
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
 if "DF" not in st.session_state:
-    # with st.spinner("Retrieving waste collection points...", show_time=True):
-    #     df = get_points_collecte_from_url()
-    # with st.spinner("Retrieving waste disposal points...", show_time=True):
-    #     df2 = get_decheteries_from_url()
-    # df = pd.concat([df, df2], ignore_index = True).reset_index(drop = True)
-    df = pd.read_csv('gam_data.csv')
-    st.session_state.DF = df
+    st.session_state.DF = pd.read_csv('gam_data.csv')
 
 def messages_append(prompt):
     st.session_state.messages.append(prompt)
@@ -68,17 +61,16 @@ def get_main_completion(messages, model='llama-3.3-70b-versatile', tools=None):
         message, location = func(**args)
         response = client.chat.completions.create(model=model, messages=message, stream=False, reasoning_format=reasoning)
         completion = response.choices[0].message.content
+        tool_call = True
     else:
-        completion, location = response_message.content, None
-    return (completion, location)
+        completion, location, tool_call = response_message.content, None, False
+    return (completion, location, tool_call)
 
-# Retrieve available models from Groq API
-model_option = col_left.selectbox(
-    "Choose a model:", 
-    options=list(st.session_state.GROQ_MODELS.keys()), 
-    format_func=lambda x: st.session_state.GROQ_MODELS[x]['name'], 
-    index=4
-)
+with st.sidebar:
+    tool_use = st.toggle('Bin locator super power', value=True)
+    # Retrieve available models from Groq API
+    model_option = st.selectbox("Choose a model:", options=list(st.session_state.GROQ_MODELS.keys()), format_func=lambda x: st.session_state.GROQ_MODELS[x]['name'], index=4)
+    raw_prompt = st.expander('Raw Prompts')
 
 # Detect model change and clear chat history if model has changed
 if st.session_state.selected_model != model_option:
@@ -86,7 +78,7 @@ if st.session_state.selected_model != model_option:
     messages_clear()
 
 # Manually clear chat history
-col_left.button('Clear chat history', on_click=messages_clear)
+col_2.button('Clear Chat', use_container_width=True, on_click=messages_clear)
 
 # Display welcome message and chat history on app rerun
 with chat_area.chat_message('assistant', avatar="🤖"):
@@ -96,36 +88,29 @@ for message in st.session_state.messages:
     with chat_area.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-######## VISION TEST
-@st.dialog("Take a photo")
+######## COMPUTER VISION PROMPT
+@st.dialog("Take a photo", width='large')
 def vision_response():
-    st.write('Use your camera')
-    picture = st.camera_input("Take a picture")
+    picture = st.camera_input("Take a picture", label_visibility='collapsed')
     if st.button("Upload") and picture is not None:
         base64_image = encode_image(picture.getvalue())
         vision_completion = client.chat.completions.create(messages=VISION_PROMPT(base64_image), model="llama-3.2-11b-vision-preview")
-        st.session_state.vision_response = vision_completion.choices[0].message.content
+        vision_response = vision_completion.choices[0].message.content
         vision_messages = [sys_prompt(MAIN_PROMPT)]
-        vision_messages.append({"role": "user", "content": st.session_state.vision_response})
+        vision_messages.append({"role": "user", "content": vision_response})
         vision_completion = get_main_completion(vision_messages, model_option)
         with chat_area.chat_message('assistant', avatar="🤖"):
             st.markdown(vision_completion[0])
         # Append user message to filtered messages only and system message to both
-        st.session_state.filtered_messages.append({"role": "user", "content": st.session_state.vision_response})
+        st.session_state.filtered_messages.append({"role": "user", "content": vision_response})
         messages_append({"role": "assistant", "content": vision_completion[0]})
         st.rerun()
 
-if "vision_response" not in st.session_state:
-    if col_right_r.button("Take photo", use_container_width=True):
-        vision_response()
-else:
-    if col_right_r.button("Remove photo", use_container_width=True):
-        del st.session_state["vision_response"]
-        st.rerun()
-
+if col_3.button("Take photo", use_container_width=True):
+    vision_response()
 
 ######## START OF CONVERSATION
-if prompt := col_right_l.chat_input("Enter your message here..."):
+if prompt := col_1.chat_input("Enter your message here..."):
 
     messages_append({"role": "user", "content": prompt})
     with chat_area.chat_message("user", avatar="👨‍💻"):
@@ -133,13 +118,12 @@ if prompt := col_right_l.chat_input("Enter your message here..."):
 
     # Set system prompt
     messages = [sys_prompt(MAIN_PROMPT)]
-    
     # Use filtered_messages to avoid repetitive function calling
     messages.extend({"role": m["role"], "content": m["content"]} for m in st.session_state.filtered_messages)
 
     # Fetch response from Groq API
     try:
-        chat_completion, location = get_main_completion(messages, model_option, [BIN_TOOL] if tool_use else None)
+        chat_completion, location, tool_call = get_main_completion(messages, model_option, [BIN_TOOL] if tool_use else None)
         with chat_area.chat_message("assistant", avatar="🤖"):
             st.markdown(chat_completion)
         
@@ -156,6 +140,6 @@ if prompt := col_right_l.chat_input("Enter your message here..."):
             st.session_state.filtered_messages.pop() # Remove function triggering user message
     except Exception as e:
         st.error(e, icon="🚨")
-
-# col_left.write(len(st.session_state.messages))
-# col_left.write(len(st.session_state.filtered_messages))
+    
+    with raw_prompt:
+        st.code(",\n\n".join(json.dumps(item) for item in st.session_state.messages), language='json', wrap_lines=True, height=250)
