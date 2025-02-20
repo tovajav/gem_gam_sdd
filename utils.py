@@ -2,9 +2,10 @@ import copy
 import requests
 import base64
 import math
+import json
 import pandas as pd
 import pydeck as pdk
-from config import AGENT_PROMPT
+from config import AGENT_PROMPT, AGENT_PROMPT_V2
 from typing import Generator
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
@@ -12,6 +13,7 @@ from geopy.distance import geodesic
 INSTRUCT_MODELS = ['qwen-2.5-32b','deepseek-r1-distill-qwen-32b','deepseek-r1-distill-llama-70b','llama-3.3-70b-versatile','llama-3.1-8b-instant','mixtral-8x7b-32768','gemma2-9b-it']
 
 sys_prompt = lambda x: {"role": "system", "content": x}
+usr_prompt = lambda x: {"role": "user", "content": x}
 
 def custom_ceil(number):
     if number < 1000:
@@ -101,7 +103,8 @@ def get_bin_location(street, zipcode, type_dechet, df):
     if nearest_location is not None:
         nearest_bin = copy.deepcopy(nearest_location)
         del nearest_bin['id'], nearest_bin['geo_point_2d'], nearest_bin['secteur'], nearest_bin['commune'], nearest_bin['distance'], nearest_bin['user']
-        message = [sys_prompt(AGENT_PROMPT.format(
+        # message = [sys_prompt(AGENT_PROMPT.format(
+        message = [usr_prompt(AGENT_PROMPT_V2.format(
             address=address, 
             nearest_bin=nearest_bin,
             distance=custom_ceil(nearest_location['distance'])
@@ -110,6 +113,33 @@ def get_bin_location(street, zipcode, type_dechet, df):
     else:
         error_prompt = 'You are Super Camille working at Grenoble Alpes Metropole. Provide a short and polite response that you were unable to get the bin location with user provided address.'
         return ([sys_prompt(error_prompt)], None)
+
+def get_main_completion(client, messages, model='llama-3.3-70b-versatile', tools={'function':None}):
+    reasoning = 'hidden' if model in ['deepseek-r1-distill-qwen-32b','deepseek-r1-distill-llama-70b'] else None
+    response = client.chat.completions.create(
+        model=model, 
+        messages=messages, 
+        stream=False, 
+        reasoning_format=reasoning,
+        tool_choice='auto',
+        tools=tools['function']
+    )
+    # Extract the response and any tool call responses
+    response_message = response.choices[0].message
+    tool_calls = response_message.tool_calls
+    if tool_calls:
+        func = eval(tool_calls[0].function.name)
+        args = json.loads(tool_calls[0].function.arguments)
+        args['df'] = tools['df']
+        # Call function 'get_bin_location' that returns message prompt and location dict
+        message, location = func(**args)
+        messages.append(message[0])
+        response = client.chat.completions.create(model=model, messages=messages, stream=False, reasoning_format=reasoning)
+        completion = response.choices[0].message.content
+        tool_call = True
+    else:
+        completion, location, tool_call = response_message.content, None, False
+    return (completion, location, tool_call)
 
 def gen_gmaps_url(user_location, bin_location):
     if not isinstance(bin_location, tuple):

@@ -71,6 +71,23 @@ AGENT_PROMPT = """\
     Your response will only include: an acknowledgment of the request, the address of the nearest trash bin, and the approximate distance from user location.\
 """
 
+AGENT_PROMPT_V2 = """\
+    Using the same language as the previous message, provide a one sentence response about below information.\
+    User address:
+    '''
+    {address}
+    '''
+    Nearest trash bin information:
+    '''
+    {nearest_bin}
+    '''
+    Approximate distance:
+    '''
+    {distance} meters
+    '''
+    Your response will only include: an acknowledgment of the request, the address of the nearest trash bin, and the approximate distance from user location.\
+"""
+
 
 VISION_PROMPT =  lambda bytes: [
     {
@@ -95,7 +112,7 @@ VISION_USER = """\
     Provide any useful information based on your expertise.\
 """
 
-BIN_TOOL = {
+BIN_FUNCTION = {
     "type": "function",
     "function": {
         "name": "get_bin_location",
