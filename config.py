@@ -130,7 +130,7 @@ BIN_FUNCTION = {
                 },
                 "type_dechet": {
                     "type": "string",
-                    "description": "The type of waste to filter the collection points. Options are: ['verre', 'emballages', 'collecte sélective', 'papier', 'ordures ménagères résiduelles','déchèterie']",
+                    "description": "The type of waste to filter the collection points. Options are: ['verre', 'emballages', 'collecte sélective', 'papier', 'ordures ménagères résiduelles','déchèterie','textiles']",
                 }
             },
             "required": ["street","zipcode","type_dechet"],
