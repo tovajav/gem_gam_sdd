@@ -5,9 +5,13 @@
 - [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://gem-gam-sdd.streamlit.app/)
 - A Streamlit-based chatbot interface that provides information about waste management services in Grenoble Alpes Metropole.
 
-### Local Version - Web Site Integration : [branch](https://github.com/tovajav/gem_gam_sdd/tree/Web_Integration)
+### Web Site Integration Version : [branch](https://github.com/tovajav/gem_gam_sdd/tree/Web_Integration)
 - A local chatbot interface that provides information about waste management services in Grenoble Alpes Metropole.
 ---
+
+### Streamlit Verison : 
+
+
 
 ## Features
 
