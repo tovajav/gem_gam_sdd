@@ -9,7 +9,7 @@
 - A local chatbot interface that provides information about waste management services in Grenoble Alpes Metropole.
 ---
 
-### Streamlit Verison :
+### Streamlit Version :
 <p align="center">
 <img src="https://github.com/tovajav/gem_gam_sdd/blob/main/img/demo.gif" />
 </p>
